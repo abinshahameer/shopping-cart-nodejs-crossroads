@@ -32,5 +32,13 @@ router.post('/add-product',(req,res)=>{
     
   })
 })
+router.get('/delete-product/:id',(req,res)=>{
+  let proId=req.params.id
+  // let proId=req.query.id
+  productHelpers.deleteProduct(proId).then((response)=>{
+    res.redirect('/admin/')
+  })
+
+})
 
 module.exports = router;
