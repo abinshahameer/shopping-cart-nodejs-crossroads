@@ -89,25 +89,30 @@ module.exports={
           return new Promise(async(resolve,reject)=>{
               let cartItems=await db.get().collection(collection.CART_COLLECTION).aggregate([
                  { $match:{user:ObjectId(userId)}},
+
                  {
-                     $lookup:{
-                         from:collection.PRODUCT_COLLECTION,
-                         let:{prodList:'$products'},
-                         pipeline:[{
-
-                            $match:{
-                                $expr:{
-                                    $in:['$_id',"$$prodList"]
-                                   
-                                }
-                            }
-
-                         }],
-                         as:'cartItems'
+                     $unwind:'$products'
+                 },
+                 {
+                     $project:{
+                         item:'$products.item',
+                         quantity:'$products.quantity',
                      }
-                 }
+                    },
+                     
+                        { $lookup:{
+                             from:collection.PRODUCT_COLLECTION,
+                             localField:'item',
+                             foreignField:'_id',
+                             as:'product'
+                             }
+                          
+                     }
+                    
+                    
+                
               ]).toArray()
-              resolve(cartItems[0].cartItems)
+              resolve(cartItems)
           })
       },
       getCartCount:(userId)=>{
@@ -120,3 +125,33 @@ resolve(count)
           })
       } 
 }
+
+
+
+
+
+// getCartProducts:(userId)=>{
+//     return new Promise(async(resolve,reject)=>{
+//         let cartItems=await db.get().collection(collection.CART_COLLECTION).aggregate([
+//            { $match:{user:ObjectId(userId)}},
+//            {
+//                $lookup:{
+//                    from:collection.PRODUCT_COLLECTION,
+//                    let:{prodList:'$products'},
+//                    pipeline:[{
+
+//                       $match:{
+//                           $expr:{
+//                               $in:['$_id',"$$prodList"]
+                             
+//                           }
+//                       }
+
+//                    }],
+//                    as:'cartItems'
+//                }
+//            }
+//         ]).toArray()
+//         resolve(cartItems[0].cartItems)
+//     })
+// },
