@@ -295,7 +295,7 @@ $pull:{products:{item:ObjectId(details.product)}}
             var options = {
                 amount: total,  // amount in the smallest currency unit
                 currency: "INR",
-                receipt:"order"+ orderId
+                receipt:""+orderId
               };
               instance.orders.create(options, function(err, order) {
                 if(err){
