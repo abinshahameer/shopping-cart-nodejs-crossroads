@@ -314,10 +314,10 @@ $pull:{products:{item:ObjectId(details.product)}}
      verifyPayment:(details)=>{
          return new Promise((resolve,reject)=>{
             const crypto=require('crypto')
-            let hmac=crypto.createHash('sha256','zRK1seNVmabRzHA6Sofpj0uI')
+            let hmac=crypto.createHmac('sha256','zRK1seNVmabRzHA6Sofpj0uI')
             hmac.update(details['payment[razorpay_order_id]']+'|'+details['payment[razorpay_payment_id]']);
             hmac=hmac.digest('hex')
-            if(hmac==details['payment[razorpay_signature']){
+            if(hmac===details['payment[razorpay_signature']){
                 resolve()
             }
             else
