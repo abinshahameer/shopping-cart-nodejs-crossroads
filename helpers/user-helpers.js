@@ -156,7 +156,7 @@ $pull:{products:{item:ObjectId(details.product)}}
             
             
             ).then((response)=>{
-                resolve(true)
+                resolve({status:true})
             })
 
         }
@@ -209,6 +209,36 @@ $pull:{products:{item:ObjectId(details.product)}}
             resolve(total[0].total)
         })
 
+     },
+     placeOrder:(order,products,total)=>{
+         return new Promise((resolve,reject)=>{
+             let status=order['payment-method']==='COD'?'placed':'pending'
+             let orderObj={
+                 deliveryDetails:{
+                     mobile:order.mobile,
+                     address:order.address,
+                     pincode:order.pincode,
+                 },
+                 userId:ObjectId(order.userId),
+                 paymentmethod:order['payment-method'],
+                 products:products,
+                 totalAmount:total,
+                 status:status,
+                 date:new Date
+             }
+             db.get().collection(collection.ORDER_COLLECTION).insertOne(orderObj).then((response)=>{
+                 db.get().collection(collection.CART_COLLECTION).removeOne({user:ObjectId(order.userId)})
+                 resolve()
+             })
+
+         })
+
+     },
+     getCartProductList:(userId)=>{
+         return new Promise(async(resolve,reject)=>{
+             let cart=await db.get().collection(collection.CART_COLLECTION).findOne({user:ObjectId(userId)})
+             resolve(cart.products)
+         })
      }
 }
 
