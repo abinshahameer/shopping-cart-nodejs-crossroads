@@ -70,6 +70,7 @@ router.get('/logout',(req,res)=>{
 })
 router.get('/cart',verifyLogin,async(req,res)=>{
   let products=await userHelpers.getCartProducts(req.session.user._id)
+  
   let totalValue=await userHelpers.getTotalAmount(req.session.user._id)
   console.log(products)
   res.render('user/cart',{products,user:req.session.user,totalValue})
@@ -122,6 +123,16 @@ router.get('/view-order-ptoducts/:id',async(req,res)=>{
   res.render('user/view-order-products',{user:req.session.user,products})
 })
 router.post('/verify-payment',(req,res)=>{
+  userHelpers.verifyPayment(req.body).then(()=>{
+
+    userHelpers.changePaymentStatus(req.body['order[receipt]']).then(()=>{
+      console.log("payment successful")
+      res.json({status:true})
+    })
+  }).catch((err)=>{
+    console.log(err)
+    res.json({status:false,errMsg:''})
+  })
 
 })
 
